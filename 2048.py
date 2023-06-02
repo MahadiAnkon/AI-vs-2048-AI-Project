@@ -157,7 +157,6 @@ while running:
                 direction = "left"
             elif event.key == pygame.K_RIGHT:
                 direction = "right"
-                print("SADIIIIDUUUDH")
             elif event.key == pygame.K_DOWN:
                 direction = "down"
             elif event.key == pygame.K_UP:
