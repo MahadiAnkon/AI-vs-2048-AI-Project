@@ -7,7 +7,7 @@ GAME_OVER_FONT_COLOR = "#ffffff"
 WINNER_BG = "#ffcc00"
 LOSER_BG = "#a39489"
 SCORE_BOARD = "#e2dbd6"
-R = "#ce4732"
+R = (0, 0, 0, 100)
 BORDER = "#000000"
 CELL_COLORS = {
     0: (204, 192, 179),

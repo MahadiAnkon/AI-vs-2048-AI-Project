@@ -1,5 +1,9 @@
+import sys
 import pygame
 import random
+import math
+import subprocess
+
 from colors import *
 
 pygame.init()
@@ -17,9 +21,54 @@ board = [[0 for _ in range(4)] for _ in range(4)]
 score = 0
 direction = ""
 
+timer_duration = 2 * 60 + 30
+start_time = pygame.time.get_ticks()
+lives = 1
+moves_without_change = 0
+max_moves_without_change = 3
+move_time_limit = 5
+last_move_time = pygame.time.get_ticks()
 
-def draw_score_board():
-    pygame.draw.rect(sc, SCORE_BOARD, [0, 0, wd, 100], 0, 0)
+def draw_score_board(remaining_time, move_time_limit, lives):
+    pygame.draw.rect(sc, (230, 230, 230), [0, 0, wd, 100])
+
+    avatar_img = pygame.image.load("image.png")
+    avatar_img = pygame.transform.scale(avatar_img, (80, 80))
+    border_rect = avatar_img.get_rect(left=20, centery=50).inflate(10, 10)
+    pygame.draw.rect(sc, (0, 0, 0), border_rect)
+    avatar_rect = avatar_img.get_rect(left=20, centery=50)
+    sc.blit(avatar_img, avatar_rect)
+
+    font = pygame.font.Font("freesansbold.ttf", 24)
+    time_text = font.render("Time: {} sec".format(remaining_time), True, (0, 0, 0))
+    time_rect = time_text.get_rect(right=wd - 20, centery=50, top=20)
+    sc.blit(time_text, time_rect)
+
+    score_text = font.render("Score: {}".format(score), True, (0, 0, 0))
+    score_rect = score_text.get_rect(right=wd - 20, centery=80, top=40)
+    sc.blit(score_text, score_rect)
+
+    lives_text = font.render("Lives: {}".format(lives), True, (0, 0, 0))
+    lives_rect = lives_text.get_rect(right=wd - 20, centery=110, top=60)
+    sc.blit(lives_text, lives_rect)
+
+    timeout_radius = 40
+    timeout_center = (60, 50)
+    timeout_thickness = 100
+    timeout_angle = (2 * math.pi) * (move_time_limit / 5)
+
+    progress_surface = pygame.Surface((2 * timeout_radius, 2 * timeout_radius), pygame.SRCALPHA)
+    pygame.draw.circle(progress_surface, (0, 0, 0, 0), (timeout_radius, timeout_radius), timeout_radius)
+    pygame.draw.arc(
+        progress_surface,
+        (0, 0, 0, 50),
+        pygame.Rect(0, 0, 2 * timeout_radius, 2 * timeout_radius),
+        math.pi / 2,
+        math.pi / 2 + timeout_angle,
+        timeout_thickness,
+    )
+
+    sc.blit(progress_surface, (timeout_center[0] - timeout_radius, timeout_center[1] - timeout_radius))
 
 
 def draw_board():
@@ -41,7 +90,6 @@ def draw_tiles(board):
                 font = pygame.font.Font("freesansbold.ttf", font_size)
                 val_txt = font.render(str(val), True, CELL_NUMBER_COLORS[val])
                 textc = val_txt.get_rect(center=(j * 95 + 57, i * 95 + 157))
-                # pygame.draw.rect(sc, color, [j * 95 + 20, i * 95 + 120, 75, 75], 0, 5)
                 sc.blit(val_txt, textc)
 
 
@@ -130,7 +178,6 @@ def down():
     combine()
     stack()
     reverse()
-    transpose()
 
 
 def take_turn(direction):
@@ -149,6 +196,15 @@ running = True
 draw_new_board = True
 
 while running:
+    remaining_time = max(timer_duration - (pygame.time.get_ticks() - start_time) // 1000, 0)
+
+    if moves_without_change >= max_moves_without_change or lives == 0 or remaining_time == 0:
+        subprocess.Popen(["python", "gameover.py"])
+        pygame.display.flip()
+        pygame.time.wait(1000)
+        pygame.quit()
+        sys.exit()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -162,6 +218,9 @@ while running:
             elif event.key == pygame.K_UP:
                 direction = "up"
 
+    current_time = pygame.time.get_ticks()
+    elapsed_time = (current_time - last_move_time) // 1000
+
     if draw_new_board or init_count < 2:
         board = draw_new(board)
         draw_new_board = False
@@ -170,10 +229,13 @@ while running:
         take_turn(direction=direction)
         draw_new_board = True
         direction = ""
+        last_move_time = pygame.time.get_ticks()
+        moves_without_change = 0
+    if elapsed_time >= move_time_limit:
+        lives -= 1
+        last_move_time = pygame.time.get_ticks()
     draw_board()
-    draw_score_board()
+    draw_score_board(remaining_time, elapsed_time, lives)
     draw_tiles(board)
     pygame.display.flip()
     timer.tick(fps)
-
-pygame.quit()
