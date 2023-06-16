@@ -76,17 +76,6 @@ class AI:
         board = AI.new_tile(board)
         return score, board
 
-    # def new_tile(board):
-    #     while True:
-    #         row = random.randint(0, 3)
-    #         col = random.randint(0, 3)
-    #         if board[row][col] == 0:
-    #             if random.randint(1, 10) == 5:
-    #                 board[row][col] = 4
-    #             else:
-    #                 board[row][col] = 2
-    #             return board
-
     def new_tile(board):
         for i in range(4):
             for j in range(4):
@@ -96,7 +85,7 @@ class AI:
         return board
 
     def minmax(board, depth, maximize):
-        if depth == 6:
+        if depth == 8:
             return 0
         l_score, tmpboard = AI.left(board)
         l_score = l_score + AI.minmax(tmpboard, depth + 1, not maximize)
