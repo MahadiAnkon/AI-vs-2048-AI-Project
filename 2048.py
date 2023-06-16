@@ -33,21 +33,20 @@ current_player = 0
 
 
 def draw_score_board(remaining_time, move_time_limit, lives):
+    global ai_score
     pygame.draw.rect(sc, (230, 230, 230), [0, 0, wd, 100])
-    pygame.draw.rect(sc, WHITISH, [40, 180, 140, 200])
-    pygame.draw.rect(sc, WHITISH, [600 + 40, 180, 140, 200])
+    pygame.draw.rect(sc, WHITISH, [40, 180, 160, 200])
+    pygame.draw.rect(sc, WHITISH, [600+40, 180, 160, 200])
     avatar_img = pygame.image.load("image.png")
     avatar_img = pygame.transform.scale(avatar_img, (80, 80))
-    border_rect = avatar_img.get_rect(left=60 + 600, centery=50, top=200).inflate(
-        10, 10
-    )
+    border_rect = avatar_img.get_rect(left=60+600, centery=50, top= 200).inflate(10, 10)
     pygame.draw.rect(sc, (0, 0, 0), border_rect)
-    avatar_rect = avatar_img.get_rect(left=60 + 600, centery=50, top=200)
+    avatar_rect = avatar_img.get_rect(left=60+600, centery=50, top=200)
     sc.blit(avatar_img, avatar_rect)
 
     avatar_img2 = pygame.image.load("image.png")
     avatar_img2 = pygame.transform.scale(avatar_img2, (80, 80))
-    avatar_rect2 = avatar_img2.get_rect(left=60, centery=50, top=200)
+    avatar_rect2 = avatar_img2.get_rect(left=60, centery=50, top= 200)
     border_rect2 = avatar_img.get_rect(left=60, centery=50, top=200).inflate(10, 10)
     pygame.draw.rect(sc, (0, 0, 0), border_rect2)
     sc.blit(avatar_img2, avatar_rect2)
@@ -57,30 +56,27 @@ def draw_score_board(remaining_time, move_time_limit, lives):
     time_rect = time_text.get_rect(center=(wd // 2, 50))
     sc.blit(time_text, time_rect)
 
-    score_text = font.render("Score: {}".format(ai_score), True, (0, 0, 0))
-    score_rect = score_text.get_rect(left=60, centery=50, top=90 + 200).inflate(10, 10)
-    sc.blit(score_text, score_rect)
+    score_text2 = font.render("Score: {}".format(ai_score), True, (0, 0, 0))
+    score_rect2 = score_text2.get_rect(left = 60, centery=50, top=90+200).inflate(10,10)
+    sc.blit(score_text2, score_rect2)
 
     lives_text = font.render("Lives: {}".format(lives), True, (0, 0, 0))
-    lives_rect = lives_text.get_rect(left=65, centery=50, top=115 + 200).inflate(10, 10)
+    lives_rect = lives_text.get_rect(left = 65, centery=50, top=115+200).inflate(10,10)
     sc.blit(lives_text, lives_rect)
     timeout(move_time_limit)
 
     score_text = font.render("Score: {}".format(score), True, (0, 0, 0))
-    score_rect = score_text.get_rect(left=660, centery=50, top=90 + 200).inflate(10, 10)
+    score_rect = score_text.get_rect(left = 660, centery=50, top=90+200).inflate(10,10)
     sc.blit(score_text, score_rect)
 
     lives_text = font.render("Lives: {}".format(lives), True, (0, 0, 0))
-    lives_rect = lives_text.get_rect(left=660 + 5, centery=50, top=110 + 200).inflate(
-        10, 10
-    )
+    lives_rect = lives_text.get_rect(left = 660+5, centery=50, top=110+200).inflate(10,10)
     sc.blit(lives_text, lives_rect)
     timeout(move_time_limit)
 
-
 def timeout(move_time_limit):
     timeout_radius = 40
-    if current_player == 0:
+    if(current_player == 0):
         timeout_center = (700, 240)
     else:
         timeout_center = (100, 240)
@@ -88,68 +84,19 @@ def timeout(move_time_limit):
     timeout_thickness = 100
     timeout_angle = (2 * math.pi) * (move_time_limit / 5)
 
-
-random.seed(10)
-
-
-def draw_score_board():
-    pygame.draw.rect(sc, SCORE_BOARD, [0, 0, wd, 100], 0, 0)
-
-
-game_state = "menu"
-timer_duration = 2 * 60 + 30
-lives = 1
-moves_without_change = 0
-max_moves_without_change = 3
-move_time_limit = 5
-players = ["Player 1", "Player 2"]
-current_player = 0
-
-
-def draw_score_board(remaining_time, move_time_limit, lives):
-    pygame.draw.rect(sc, (230, 230, 230), [0, 0, wd, 100])
-    pygame.draw.rect(sc, WHITISH, [40, 180, 140, 200])
-    pygame.draw.rect(sc, WHITISH, [600 + 40, 180, 140, 200])
-    avatar_img = pygame.image.load("image.png")
-    avatar_img = pygame.transform.scale(avatar_img, (80, 80))
-    border_rect = avatar_img.get_rect(left=60 + 600, centery=50, top=200).inflate(
-        10, 10
+    progress_surface = pygame.Surface((2 * timeout_radius, 2 * timeout_radius), pygame.SRCALPHA)
+    pygame.draw.circle(progress_surface, (0, 0, 0, 0), (timeout_radius, timeout_radius), timeout_radius)
+    pygame.draw.arc(
+        progress_surface,
+        (0, 0, 0, 50),
+        pygame.Rect(0, 0, 2 * timeout_radius, 2 * timeout_radius),
+        math.pi / 2,
+        math.pi / 2 + timeout_angle,
+        timeout_thickness,
     )
-    pygame.draw.rect(sc, (0, 0, 0), border_rect)
-    avatar_rect = avatar_img.get_rect(left=60 + 600, centery=50, top=200)
-    sc.blit(avatar_img, avatar_rect)
 
-    avatar_img2 = pygame.image.load("image.png")
-    avatar_img2 = pygame.transform.scale(avatar_img2, (80, 80))
-    avatar_rect2 = avatar_img2.get_rect(left=60, centery=50, top=200)
-    border_rect2 = avatar_img.get_rect(left=60, centery=50, top=200).inflate(10, 10)
-    pygame.draw.rect(sc, (0, 0, 0), border_rect2)
-    sc.blit(avatar_img2, avatar_rect2)
+    sc.blit(progress_surface, (timeout_center[0] - timeout_radius, timeout_center[1] - timeout_radius))
 
-    font = pygame.font.Font("freesansbold.ttf", 24)
-    time_text = font.render("Time: {} sec".format(remaining_time), True, (255, 0, 0))
-    time_rect = time_text.get_rect(center=(wd // 2, 50))
-    sc.blit(time_text, time_rect)
-
-    score_text = font.render("Score: {}".format(score), True, (0, 0, 0))
-    score_rect = score_text.get_rect(left=60, centery=50, top=90 + 200).inflate(10, 10)
-    sc.blit(score_text, score_rect)
-
-    lives_text = font.render("Lives: {}".format(lives), True, (0, 0, 0))
-    lives_rect = lives_text.get_rect(left=65, centery=50, top=115 + 200).inflate(10, 10)
-    sc.blit(lives_text, lives_rect)
-    timeout(move_time_limit)
-
-    score_text = font.render("Score: {}".format(score), True, (0, 0, 0))
-    score_rect = score_text.get_rect(left=660, centery=50, top=90 + 200).inflate(10, 10)
-    sc.blit(score_text, score_rect)
-
-    lives_text = font.render("Lives: {}".format(lives), True, (0, 0, 0))
-    lives_rect = lives_text.get_rect(left=660 + 5, centery=50, top=110 + 200).inflate(
-        10, 10
-    )
-    sc.blit(lives_text, lives_rect)
-    timeout(move_time_limit)
 
 
 def timeout(move_time_limit):
@@ -215,9 +162,6 @@ def draw_new(board):
     return board
 
 
-import pygame
-
-
 def mainmenu():
     pygame.init()
     pygame.display.set_caption("Main Menu")
@@ -260,7 +204,7 @@ def mainmenu():
                     y = he // 2 - 120
                     for i, option in enumerate(time_options):
                         option_width = font.size(option)[0]
-                        option_rect = pygame.Rect(x, y, option_width, button_height)
+                        
                         if option_rect.collidepoint(mouse_pos):
                             selected_time_option = i
                             if selected_time_option == 0:
@@ -271,6 +215,7 @@ def mainmenu():
                                 timer_duration = 5 * 60
                             break
                         x += option_width + font.size("| ")[0]
+                        option_rect = pygame.Rect(x, y, option_width, button_height)
 
         sc.fill(WHITISH)
         logo_x = 300
@@ -499,10 +444,11 @@ while running:
             init_count += 1
 
         if ai_time:
-            pygame.time.delay(2000)
             move = AI.main(board)
             print(move)
+            #pygame.time.delay(2000)
             take_turn(direction=move)
+            current_player = (current_player + 1) % len(players)
             ai_time = False
             draw_new_board = True
 
