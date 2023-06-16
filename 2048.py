@@ -36,14 +36,13 @@ def draw_score_board(remaining_time, move_time_limit, lives):
     global ai_score
     pygame.draw.rect(sc, (230, 230, 230), [0, 0, wd, 100])
     pygame.draw.rect(sc, WHITISH, [40, 140, 160, 240])
-    pygame.draw.rect(sc, WHITISH, [600+40, 140, 160, 240])
+    pygame.draw.rect(sc, WHITISH, [600 + 40, 140, 160, 240])
     font = pygame.font.Font("freesansbold.ttf", 24)
     your_turn = font.render("Your Turn: ", True, (0, 0, 0))
-    your_turn_rect = your_turn.get_rect(left = 645, centery=50, top=160).inflate(10,10)
+    your_turn_rect = your_turn.get_rect(left=645, centery=50, top=160).inflate(10, 10)
     your_turn2 = font.render("AI's Turn: ", True, (0, 0, 0))
-    your_turn_rect2 = your_turn2.get_rect(left = 55, centery=50, top=160).inflate(10,10)
+    your_turn_rect2 = your_turn2.get_rect(left=55, centery=50, top=160).inflate(10, 10)
 
-    
     avatar_img = pygame.image.load("image.png")
     avatar_img = pygame.transform.scale(avatar_img, (80, 80))
     border_rect = avatar_img.get_rect(left=60 + 600, centery=50, top=200).inflate(
@@ -59,7 +58,6 @@ def draw_score_board(remaining_time, move_time_limit, lives):
     border_rect2 = avatar_img.get_rect(left=60, centery=50, top=200).inflate(10, 10)
     pygame.draw.rect(sc, (0, 0, 0), border_rect2)
     sc.blit(avatar_img2, avatar_rect2)
-
 
     time_text = font.render("Time: {} sec".format(remaining_time), True, (255, 0, 0))
     time_rect = time_text.get_rect(center=(wd // 2, 50))
@@ -116,6 +114,7 @@ def timeout(move_time_limit):
         progress_surface,
         (timeout_center[0] - timeout_radius, timeout_center[1] - timeout_radius),
     )
+
 
 def draw_board():
     pygame.draw.rect(sc, GRID_COLOR, [200, 100, wd - 400, he - 100], 0, 0)
@@ -181,8 +180,12 @@ def mainmenu():
                 if start_game_button.collidepoint(mouse_pos):
                     return "gameplay"
                 else:
-                    x = (wd - sum([font.size(option)[0] for option in time_options]) - (len(time_options) - 1) * font.size("| ")[0]) // 2
-                    y = he // 2 - 120+180
+                    x = (
+                        wd
+                        - sum([font.size(option)[0] for option in time_options])
+                        - (len(time_options) - 1) * font.size("| ")[0]
+                    ) // 2
+                    y = he // 2 - 120 + 180
                     for i, option in enumerate(time_options):
                         option_width = font.size(option)[0]
                         option_rect = pygame.Rect(x, y, option_width, button_height)
@@ -240,10 +243,10 @@ def mainmenu():
 
 
 def mm():
-    global score,ai_score
+    global score, ai_score
     sc = pygame.display.set_mode((wd, he))
     pygame.display.set_caption("Gameover")
-    
+
     if len(sys.argv) > 1:
         score = int(sys.argv[1])
 
@@ -256,14 +259,13 @@ def mm():
     main_menu_x = (wd - button_width) // 2
     main_menu_y = (he - button_height) // 2 + 50
 
-    if score>ai_score:
+    if score > ai_score:
         game_over_text = font.render("Human Won ", True, (255, 255, 255))
-    elif score==ai_score:
+    elif score == ai_score:
         game_over_text = font.render("Match Drawn", True, (255, 255, 255))
     else:
         game_over_text = font.render("AI Won", True, (255, 255, 255))
 
-        
     game_over_rect = game_over_text.get_rect(center=(wd // 2, game_over_y))
 
     game_over_button = pygame.Rect(
@@ -442,11 +444,11 @@ while running:
             current_player = (current_player + 1) % len(players)
             ai_time = False
             last_move_time = pygame.time.get_ticks()
-            draw_new_board = True
+            # draw_new_board = True
 
         if direction != "":
             take_turn(direction=direction)
-            draw_new_board = True
+            # draw_new_board = True
             direction = ""
             last_move_time = pygame.time.get_ticks()
             ai_time = True

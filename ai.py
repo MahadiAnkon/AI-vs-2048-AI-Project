@@ -76,6 +76,17 @@ class AI:
         board = AI.new_tile(board)
         return score, board
 
+    # def new_tile(board):
+    #     while True:
+    #         row = random.randint(0, 3)
+    #         col = random.randint(0, 3)
+    #         if board[row][col] == 0:
+    #             if random.randint(1, 10) == 5:
+    #                 board[row][col] = 4
+    #             else:
+    #                 board[row][col] = 2
+    #             return board
+
     def new_tile(board):
         for i in range(4):
             for j in range(4):
@@ -84,48 +95,103 @@ class AI:
                     return board
         return board
 
-    def minmax(board, depth, maximize):
-        if depth == 8:
+    def minmax(board, depth, alpha, beta, maximize):
+        if depth == 10:
             return 0
-        l_score, tmpboard = AI.left(board)
-        l_score = l_score + AI.minmax(tmpboard, depth + 1, not maximize)
-
-        r_score, tmpboard = AI.right(board)
-        r_score = r_score + AI.minmax(tmpboard, depth + 1, not maximize)
-
-        u_score, tmpboard = AI.up(board)
-        u_score = u_score + AI.minmax(tmpboard, depth + 1, not maximize)
-
-        d_score, tmpboard = AI.down(board)
-        d_score = d_score + AI.minmax(tmpboard, depth + 1, not maximize)
         if maximize:
-            return np.max([u_score, d_score, r_score, l_score])
+            maxval = 0
+            l_score, tmpboard = AI.left(board)
+            l_score = l_score + AI.minmax(
+                tmpboard, depth + 1, alpha, beta, not maximize
+            )
+            maxval = max(l_score, maxval)
+            alpha = max(alpha, l_score)
+            if beta <= alpha:
+                return maxval
+            r_score, tmpboard = AI.right(board)
+            r_score = r_score + AI.minmax(
+                tmpboard, depth + 1, alpha, beta, not maximize
+            )
+            maxval = max(r_score, maxval)
+            alpha = max(alpha, r_score)
+            if beta <= alpha:
+                return maxval
+
+            u_score, tmpboard = AI.up(board)
+            u_score = u_score + AI.minmax(
+                tmpboard, depth + 1, alpha, beta, not maximize
+            )
+            maxval = max(u_score, maxval)
+            alpha = max(alpha, u_score)
+            if beta <= alpha:
+                return maxval
+            d_score, tmpboard = AI.down(board)
+            d_score = d_score + AI.minmax(
+                tmpboard, depth + 1, alpha, beta, not maximize
+            )
+            alpha = max(alpha, d_score)
+            maxval = max(d_score, maxval)
+            return maxval
+
         else:
-            return np.min([u_score, d_score, r_score, l_score])
+            minval = np.Infinity
+            l_score, tmpboard = AI.left(board)
+            l_score = l_score + AI.minmax(
+                tmpboard, depth + 1, alpha, beta, not maximize
+            )
+            minval = min(minval, l_score)
+            beta = min(beta, l_score)
+            if beta <= alpha:
+                return minval
+            r_score, tmpboard = AI.right(board)
+            r_score = r_score + AI.minmax(
+                tmpboard, depth + 1, alpha, beta, not maximize
+            )
+            minval = min(minval, r_score)
+            beta = min(beta, r_score)
+            if beta <= alpha:
+                return minval
+            u_score, tmpboard = AI.up(board)
+            u_score = u_score + AI.minmax(
+                tmpboard, depth + 1, alpha, beta, not maximize
+            )
+            minval = min(minval, u_score)
+            beta = min(beta, u_score)
+            if beta <= alpha:
+                return minval
+            d_score, tmpboard = AI.down(board)
+            d_score = d_score + AI.minmax(
+                tmpboard, depth + 1, alpha, beta, not maximize
+            )
+            minval = min(minval, d_score)
+            beta = min(beta, d_score)
+            return minval
 
     def main(board):
         # global board
         # board = np.zeros((4, 4), dtype=np.int64)
+        alpha = 0
+        beta = np.Infinity
         score = 0
         l_score, tmpboard = AI.left(board)
-        l_score = l_score + AI.minmax(tmpboard, 1, False)
+        l_score = l_score + AI.minmax(tmpboard, 1, alpha, beta, False)
         score = l_score
         move = "left"
 
         r_score, tmpboard = AI.right(board)
-        r_score = r_score + AI.minmax(tmpboard, 1, False)
+        r_score = r_score + AI.minmax(tmpboard, 1, alpha, beta, False)
         if score < r_score:
             score = r_score
             move = "right"
 
         u_score, tmpboard = AI.up(board)
-        u_score = u_score + AI.minmax(tmpboard, 1, False)
+        u_score = u_score + AI.minmax(tmpboard, 1, alpha, beta, False)
         if score < u_score:
             score = u_score
             move = "up"
 
         d_score, tmpboard = AI.down(board)
-        d_score = d_score + AI.minmax(tmpboard, 1, False)
+        d_score = d_score + AI.minmax(tmpboard, 1, alpha, beta, False)
         if score < d_score:
             score = d_score
             move = "down"
