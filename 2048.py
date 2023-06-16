@@ -1,6 +1,8 @@
 import pygame
 import random
 from colors import *
+from ai import AI
+
 
 pygame.init()
 
@@ -15,7 +17,10 @@ grid_size = 4
 grid_padding = 8
 board = [[0 for _ in range(4)] for _ in range(4)]
 score = 0
+ai_score = 0
+ai_time = False
 direction = ""
+random.seed(10)
 
 
 def draw_score_board():
@@ -47,15 +52,20 @@ def draw_tiles(board):
 
 def draw_new(board):
     if any(0 in row for row in board):
-        while True:
-            row = random.randint(0, 3)
-            col = random.randint(0, 3)
-            if board[row][col] == 0:
-                if random.randint(1, 10) == 5:
-                    board[row][col] = 4
-                else:
-                    board[row][col] = 2
-                break
+        # while True:
+        # row = random.randint(0, 3)
+        # col = random.randint(0, 3)
+        # if board[row][col] == 0:
+        #     if random.randint(1, 10) == 5:
+        #         board[row][col] = 4
+        #     else:
+        #         board[row][col] = 2
+        #     break
+        for i in range(4):
+            for j in range(4):
+                if board[i][j] == 0:
+                    board[i][j] = 2
+                    return board
     return board
 
 
@@ -74,12 +84,17 @@ def stack():
 def combine():
     global board
     global score
+    global ai_time
+    global ai_score
     for i in range(4):
         for j in range(3):
             if board[i][j] != 0 and board[i][j] == board[i][j + 1]:
                 board[i][j] *= 2
                 board[i][j + 1] = 0
-                score += board[i][j]
+                if ai_time:
+                    ai_score += board[i][j]
+                else:
+                    score += board[i][j]
 
 
 def reverse():
@@ -134,6 +149,7 @@ def down():
 
 
 def take_turn(direction):
+    global board
     if direction == "left":
         left()
     elif direction == "right":
@@ -142,11 +158,14 @@ def take_turn(direction):
         up()
     elif direction == "down":
         down()
-    print(score)
+    print("Human: ", score)
+    print("AI: ", ai_score)
+    board = draw_new(board)
 
 
 running = True
 draw_new_board = True
+
 
 while running:
     for event in pygame.event.get():
@@ -162,14 +181,24 @@ while running:
             elif event.key == pygame.K_UP:
                 direction = "up"
 
-    if draw_new_board or init_count < 2:
+    if init_count < 2:
         board = draw_new(board)
         draw_new_board = False
         init_count += 1
+
+    if ai_time:
+        pygame.time.delay(2000)
+        move = AI.main(board)
+        print(move)
+        take_turn(direction=move)
+        ai_time = False
+        draw_new_board = True
+
     if direction != "":
         take_turn(direction=direction)
         draw_new_board = True
         direction = ""
+        ai_time = True
     draw_board()
     draw_score_board()
     draw_tiles(board)
