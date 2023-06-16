@@ -6,7 +6,7 @@ from colors import *
 
 pygame.init()
 
-wd = 400
+wd = 800
 he = 500
 sc = pygame.display.set_mode([wd, he])
 init_count = 0
@@ -24,33 +24,57 @@ lives = 1
 moves_without_change = 0
 max_moves_without_change = 3
 move_time_limit = 5
-
+players = ["Player 1", "Player 2"]
+current_player = 0
 
 def draw_score_board(remaining_time, move_time_limit, lives):
     pygame.draw.rect(sc, (230, 230, 230), [0, 0, wd, 100])
-
+    pygame.draw.rect(sc, WHITISH, [40, 180, 140, 200])
+    pygame.draw.rect(sc, WHITISH, [600+40, 180, 140, 200])
     avatar_img = pygame.image.load("image.png")
     avatar_img = pygame.transform.scale(avatar_img, (80, 80))
-    border_rect = avatar_img.get_rect(left=20, centery=50).inflate(10, 10)
+    border_rect = avatar_img.get_rect(left=60+600, centery=50, top= 200).inflate(10, 10)
     pygame.draw.rect(sc, (0, 0, 0), border_rect)
-    avatar_rect = avatar_img.get_rect(left=20, centery=50)
+    avatar_rect = avatar_img.get_rect(left=60+600, centery=50, top=200)
     sc.blit(avatar_img, avatar_rect)
 
+    avatar_img2 = pygame.image.load("image.png")
+    avatar_img2 = pygame.transform.scale(avatar_img2, (80, 80))
+    avatar_rect2 = avatar_img2.get_rect(left=60, centery=50, top= 200)
+    border_rect2 = avatar_img.get_rect(left=60, centery=50, top=200).inflate(10, 10)
+    pygame.draw.rect(sc, (0, 0, 0), border_rect2)
+    sc.blit(avatar_img2, avatar_rect2)
+
     font = pygame.font.Font("freesansbold.ttf", 24)
-    time_text = font.render("Time: {} sec".format(remaining_time), True, (0, 0, 0))
-    time_rect = time_text.get_rect(right=wd - 20, centery=50, top=20)
+    time_text = font.render("Time: {} sec".format(remaining_time), True, (255, 0, 0))
+    time_rect = time_text.get_rect(center=(wd // 2, 50))
     sc.blit(time_text, time_rect)
 
     score_text = font.render("Score: {}".format(score), True, (0, 0, 0))
-    score_rect = score_text.get_rect(right=wd - 20, centery=80, top=40)
+    score_rect = score_text.get_rect(left = 60, centery=50, top=90+200).inflate(10,10)
     sc.blit(score_text, score_rect)
 
     lives_text = font.render("Lives: {}".format(lives), True, (0, 0, 0))
-    lives_rect = lives_text.get_rect(right=wd - 20, centery=110, top=60)
+    lives_rect = lives_text.get_rect(left = 65, centery=50, top=115+200).inflate(10,10)
     sc.blit(lives_text, lives_rect)
+    timeout(move_time_limit)
 
+    score_text = font.render("Score: {}".format(score), True, (0, 0, 0))
+    score_rect = score_text.get_rect(left = 660, centery=50, top=90+200).inflate(10,10)
+    sc.blit(score_text, score_rect)
+
+    lives_text = font.render("Lives: {}".format(lives), True, (0, 0, 0))
+    lives_rect = lives_text.get_rect(left = 660+5, centery=50, top=110+200).inflate(10,10)
+    sc.blit(lives_text, lives_rect)
+    timeout(move_time_limit)
+
+def timeout(move_time_limit):
     timeout_radius = 40
-    timeout_center = (60, 50)
+    if(current_player == 0):
+        timeout_center = (700, 240)
+    else:
+        timeout_center = (100, 240)
+
     timeout_thickness = 100
     timeout_angle = (2 * math.pi) * (move_time_limit / 5)
 
@@ -69,7 +93,7 @@ def draw_score_board(remaining_time, move_time_limit, lives):
 
 
 def draw_board():
-    pygame.draw.rect(sc, GRID_COLOR, [0, 100, wd, he - 100], 0, 0)
+    pygame.draw.rect(sc, GRID_COLOR, [200, 100, wd-400, he - 100], 0, 0)
 
 
 def draw_tiles(board):
@@ -80,13 +104,13 @@ def draw_tiles(board):
                 color = CELL_COLORS[val]
             else:
                 color = R
-            pygame.draw.rect(sc, color, [j * 95 + 20, i * 95 + 120, 75, 75], 0, 5)
+            pygame.draw.rect(sc, color, [j * 95 + 220, i * 95 + 120, 75, 75], 0, 5)
             if val > 0:
                 vlen = len(str(val))
                 font_size = 48 - (5 * vlen)
                 font = pygame.font.Font("freesansbold.ttf", font_size)
                 val_txt = font.render(str(val), True, CELL_NUMBER_COLORS[val])
-                textc = val_txt.get_rect(center=(j * 95 + 57, i * 95 + 157))
+                textc = val_txt.get_rect(center=(j * 95 + 257, i * 95 + 157))
                 sc.blit(val_txt, textc)
 
 
@@ -102,6 +126,9 @@ def draw_new(board):
                     board[row][col] = 2
                 break
     return board
+
+import pygame
+
 def mainmenu():
     pygame.init()
     pygame.display.set_caption("Main Menu")
@@ -111,12 +138,19 @@ def mainmenu():
     button_width, button_height = 200, 50
 
     start_game_x = (wd - button_width) // 2
-    start_game_y = (he - button_height) // 2 + 80
-    two_minutes_x = (wd - button_width) // 2
-    two_minutes_y = (he - button_height) // 2 + 160
+    start_game_y = (he - button_height) // 2 + 180
 
     start_game_button = pygame.Rect(start_game_x, start_game_y, button_width, button_height)
-    two_minutes_button = pygame.Rect(two_minutes_x, two_minutes_y, button_width, button_height)
+
+
+    time_options = ["2 minutes", "2.5 minutes", "5 minutes"]
+    selected_time_option = 1
+    global timer_duration
+
+    # Load logo image
+    logo_image = pygame.image.load("h2048.png")
+    logo_width = 300
+    logo_height = 100
 
     while True:
         for event in pygame.event.get():
@@ -127,36 +161,67 @@ def mainmenu():
                 mouse_pos = pygame.mouse.get_pos()
                 if start_game_button.collidepoint(mouse_pos):
                     return "gameplay"
-                    
-                elif two_minutes_button.collidepoint(mouse_pos):
-                    pygame.quit()
-                    sys.exit()
+                else:
+                    x = (wd - sum([font.size(option)[0] for option in time_options]) - (len(time_options) - 1) * font.size("| ")[0]) // 2
+                    y = he // 2 - 120
+                    for i, option in enumerate(time_options):
+                        option_width = font.size(option)[0]
+                        option_rect = pygame.Rect(x, y, option_width, button_height)
+                        if option_rect.collidepoint(mouse_pos):
+                            selected_time_option = i
+                            if selected_time_option == 0:
+                                timer_duration = 2 * 60
+                            elif selected_time_option == 1:
+                                timer_duration = 2 * 60 + 30
+                            elif selected_time_option == 2:
+                                timer_duration = 5 * 60
+                            break
+                        x += option_width + font.size("| ")[0]
 
         sc.fill(WHITISH)
+        logo_x = 300
+        logo_y = 60
+        sc.blit(logo_image, (logo_x, logo_y))
 
         if start_game_button.collidepoint(pygame.mouse.get_pos()):
             pygame.draw.rect(sc, CELL_COLORS[8], start_game_button)
         else:
             pygame.draw.rect(sc, CELL_COLORS[16], start_game_button)
-        if two_minutes_button.collidepoint(pygame.mouse.get_pos()):
-            pygame.draw.rect(sc, GRID_COLOR, two_minutes_button)
-        else:
-            pygame.draw.rect(sc, GRAYISH, two_minutes_button)
 
         start_game_text = font.render("Start Game", True, (255, 255, 255))
         start_game_rect = start_game_text.get_rect(center=start_game_button.center)
         sc.blit(start_game_text, start_game_rect)
 
-        two_minutes_text = font.render("Exit", True, (255, 255, 255))
-        two_minutes_rect = two_minutes_text.get_rect(center=two_minutes_button.center)
-        sc.blit(two_minutes_text, two_minutes_rect)
+        x = (wd - sum([font.size(option)[0] for option in time_options]) - (len(time_options) - 1) * font.size("| ")[0]) // 2
+        y = he // 2 +60
+        for i, option in enumerate(time_options):
+            option_width = font.size(option)[0]
+            option_rect = pygame.Rect(x, y, option_width, button_height)
+            if i == selected_time_option:
+                option_text = font.render(option, True, (0, 0, 0))
+            else:
+                option_text = font.render(option, True, (128, 128, 128))
+            option_text_rect = option_text.get_rect(center=option_rect.center)
+            sc.blit(option_text, option_text_rect)
+            x += option_width + font.size("| ")[0]
+            if i < len(time_options) - 1:
+                separator_text = font.render("| ", True, (128, 128, 128))
+                separator_rect = separator_text.get_rect(midleft=(x, y + button_height // 2))
+                sc.blit(separator_text, separator_rect)
+                x += separator_rect.width
 
         pygame.display.flip()
         clock.tick(60)
 
 
+
+
+
+
+
+
+
 def mm():
-    wd, he = 400, 500
     sc = pygame.display.set_mode((wd, he))
     pygame.display.set_caption("Game Over")
     if len(sys.argv) > 1:
@@ -289,14 +354,13 @@ draw_new_board = True
 while running:
     if(game_state=="menu"):
         a = mainmenu()
-        print("kuta")
         start_time = pygame.time.get_ticks()
         last_move_time = pygame.time.get_ticks()
         board = [[0 for _ in range(4)] for _ in range(4)]
         draw_new_board = True
         init_count=0
         score = 0
-        lives = 1
+        lives = 30
         game_state = a
     else:
         remaining_time = max(timer_duration - (pygame.time.get_ticks() - start_time) // 1000, 0)
@@ -319,6 +383,8 @@ while running:
                 elif event.key == pygame.K_UP:
                     direction = "up"
 
+        if direction:
+                current_player = (current_player + 1) % len(players)
         current_time = pygame.time.get_ticks()
         elapsed_time = (current_time - last_move_time) // 1000
 
@@ -334,11 +400,10 @@ while running:
             moves_without_change = 0
         if elapsed_time >= move_time_limit:
             lives -= 1
+            current_player = (current_player + 1) % len(players)
             last_move_time = pygame.time.get_ticks()
         draw_board()
         draw_score_board(remaining_time, elapsed_time, lives)
         draw_tiles(board)
         pygame.display.flip()
         timer.tick(fps)
-
-
