@@ -96,7 +96,7 @@ class AI:
         return board
 
     def minmax(board, depth, maximize):
-        if depth == 6:
+        if depth == 8:
             return 0
         l_score, tmpboard = AI.left(board)
         l_score = l_score + AI.minmax(tmpboard, depth + 1, not maximize)
