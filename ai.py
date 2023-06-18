@@ -2,14 +2,18 @@ import random
 import numpy as np
 import math
 
+height = 2
+width = 2
+
 
 class AI:
     def stack(board):
-        new_matrix = [[0] * 4 for _ in range(4)]
+        global height, width
+        new_matrix = [[0] * width for _ in range(height)]
 
-        for i in range(4):
+        for i in range(height):
             fill_position = 0
-            for j in range(4):
+            for j in range(width):
                 if board[i][j] != 0:
                     new_matrix[i][fill_position] = board[i][j]
                     fill_position += 1
@@ -17,8 +21,8 @@ class AI:
 
     def combine(board):
         score = 0
-        for i in range(4):
-            for j in range(3):
+        for i in range(height):
+            for j in range(width - 1):
                 if board[i][j] != 0 and board[i][j] == board[i][j + 1]:
                     board[i][j] *= 2
                     board[i][j + 1] = 0
@@ -26,17 +30,19 @@ class AI:
         return score, board
 
     def reverse(board):
+        global height, width
         new_matrix = []
-        for i in range(4):
+        for i in range(height):
             new_matrix.append([])
-            for j in range(4):
-                new_matrix[i].append(board[i][3 - j])
+            for j in range(width):
+                new_matrix[i].append(board[i][width - 1 - j])
         return new_matrix
 
     def transpose(board):
-        new_matrix = [[0] * 4 for _ in range(4)]
-        for i in range(4):
-            for j in range(4):
+        global height, width
+        new_matrix = [[0] * width for _ in range(height)]
+        for i in range(height):
+            for j in range(width):
                 new_matrix[i][j] = board[j][i]
         return new_matrix
 
@@ -76,20 +82,10 @@ class AI:
         board = AI.new_tile(board)
         return score, board
 
-    # def new_tile(board):
-    #     while True:
-    #         row = random.randint(0, 3)
-    #         col = random.randint(0, 3)
-    #         if board[row][col] == 0:
-    #             if random.randint(1, 10) == 5:
-    #                 board[row][col] = 4
-    #             else:
-    #                 board[row][col] = 2
-    #             return board
-
     def new_tile(board):
-        for i in range(4):
-            for j in range(4):
+        global height, width
+        for i in range(height):
+            for j in range(width):
                 if board[i][j] == 0:
                     board[i][j] = 2
                     return board
@@ -197,3 +193,30 @@ class AI:
             move = "down"
 
         return move
+
+    def check_draw(board):
+        global height, width
+        point = 0
+        lboard = np.copy(board)
+        a, lboard = AI.left(lboard)
+        point = point + a
+        rboard = np.copy(board)
+        a, rboard = AI.right(rboard)
+        point = point + a
+        uboard = np.copy(board)
+        a, uboard = AI.up(uboard)
+        point = point + a
+        dboard = np.copy(board)
+        a, dboard = AI.down(dboard)
+        point = point + a
+        print(board)
+        print(lboard, rboard, uboard, dboard)
+        zero = False
+        for i in range(height):
+            for j in range(width):
+                if board[i][j] == 0:
+                    zero = True
+        if lboard == rboard == dboard == uboard and point == 0 and not zero:
+            return True
+
+        return False
