@@ -258,8 +258,9 @@ def mm():
     game_over_y = (he - button_height) // 2 - 50
     main_menu_x = (wd - button_width) // 2
     main_menu_y = (he - button_height) // 2 + 50
-
-    if score > ai_score:
+    if lives == 0:
+        game_over_text = font.render("AI Won ", True, (255, 255, 255))
+    elif score > ai_score:
         game_over_text = font.render("Human Won ", True, (255, 255, 255))
     elif score == ai_score:
         game_over_text = font.render("Match Drawn", True, (255, 255, 255))
@@ -439,7 +440,8 @@ while running:
         if ai_time:
             move = AI.main(board)
             print(move)
-            # pygame.time.delay(2000)
+            
+            pygame.time.delay(2000)
             take_turn(direction=move)
             current_player = (current_player + 1) % len(players)
             ai_time = False
