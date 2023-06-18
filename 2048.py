@@ -17,7 +17,9 @@ fps = 60
 game_over = False
 grid_size = 4
 grid_padding = 8
-board = [[0 for _ in range(4)] for _ in range(4)]
+height = 2
+width = 2
+board = [[0 for _ in range(width)] for _ in range(height)]
 score = 0
 ai_score = 0
 ai_time = False
@@ -30,6 +32,7 @@ max_moves_without_change = 3
 move_time_limit = 5
 players = ["Player 1", "Player 2"]
 current_player = 0
+draw = False
 
 
 def draw_score_board(remaining_time, move_time_limit, lives):
@@ -121,8 +124,8 @@ def draw_board():
 
 
 def draw_tiles(board):
-    for i in range(grid_size):
-        for j in range(grid_size):
+    for i in range(height):
+        for j in range(width):
             val = board[i][j]
             if val <= 2048:
                 color = CELL_COLORS[val]
@@ -139,9 +142,10 @@ def draw_tiles(board):
 
 
 def draw_new(board):
+    global height, width
     if any(0 in row for row in board):
-        for i in range(4):
-            for j in range(4):
+        for i in range(height):
+            for j in range(width):
                 if board[i][j] == 0:
                     board[i][j] = 2
                     return board
@@ -297,10 +301,11 @@ def mm():
 
 def stack():
     global board
-    new_matrix = [[0] * 4 for _ in range(4)]
-    for i in range(4):
+    global height, width
+    new_matrix = [[0] * width for _ in range(height)]
+    for i in range(height):
         fill_position = 0
-        for j in range(4):
+        for j in range(width):
             if board[i][j] != 0:
                 new_matrix[i][fill_position] = board[i][j]
                 fill_position += 1
@@ -312,8 +317,9 @@ def combine():
     global score
     global ai_time
     global ai_score
-    for i in range(4):
-        for j in range(3):
+    global height, width
+    for i in range(height):
+        for j in range(width - 1):
             if board[i][j] != 0 and board[i][j] == board[i][j + 1]:
                 board[i][j] *= 2
                 board[i][j + 1] = 0
@@ -325,19 +331,21 @@ def combine():
 
 def reverse():
     global board
+    global height, width
     new_matrix = []
-    for i in range(4):
+    for i in range(height):
         new_matrix.append([])
-        for j in range(4):
-            new_matrix[i].append(board[i][3 - j])
+        for j in range(width):
+            new_matrix[i].append(board[i][width - 1 - j])
     board = new_matrix
 
 
 def transpose():
     global board
-    new_matrix = [[0] * 4 for _ in range(4)]
-    for i in range(4):
-        for j in range(4):
+    global height, width
+    new_matrix = [[0] * width for _ in range(height)]
+    for i in range(height):
+        for j in range(width):
             new_matrix[i][j] = board[j][i]
     board = new_matrix
 
@@ -398,7 +406,7 @@ while running:
         a = mainmenu()
         start_time = pygame.time.get_ticks()
         last_move_time = pygame.time.get_ticks()
-        board = [[0 for _ in range(4)] for _ in range(4)]
+        board = [[0 for _ in range(width)] for _ in range(height)]
         draw_new_board = True
         init_count = 0
         score = 0
@@ -412,7 +420,9 @@ while running:
         if lives == 0 or remaining_time == 0:
             a = mm()
             game_state = a
-
+        if draw:
+            a = mm()
+            game_state = a
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -444,6 +454,8 @@ while running:
             current_player = (current_player + 1) % len(players)
             ai_time = False
             last_move_time = pygame.time.get_ticks()
+            if AI.check_draw(board):
+                draw = True
             # draw_new_board = True
 
         if direction != "":
@@ -453,6 +465,8 @@ while running:
             last_move_time = pygame.time.get_ticks()
             ai_time = True
             moves_without_change = 0
+            if AI.check_draw(board):
+                draw = True
 
         if elapsed_time >= move_time_limit:
             if current_player == 0:
