@@ -2,8 +2,8 @@ import random
 import numpy as np
 import math
 
-height = 2
-width = 2
+height = 4
+width = 4
 
 
 class AI:
@@ -209,8 +209,6 @@ class AI:
         dboard = np.copy(board)
         a, dboard = AI.down(dboard)
         point = point + a
-        print(board)
-        print(lboard, rboard, uboard, dboard)
         zero = False
         for i in range(height):
             for j in range(width):
