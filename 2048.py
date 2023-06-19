@@ -25,7 +25,7 @@ ai_score = 0
 ai_time = False
 direction = ""
 game_state = "menu"
-timer_duration = 2
+timer_duration = 2*60
 lives = 1
 moves_without_change = 0
 max_moves_without_change = 3
@@ -167,7 +167,7 @@ def mainmenu():
         start_game_x, start_game_y, button_width, button_height
     )
 
-    time_options = ["2 minutes", "2.5 minutes", "5 minutes"]
+    time_options = ["30 seconds", "2 minutes", "3 minutes"]
     selected_time_option = 1
     global timer_duration
 
@@ -196,11 +196,11 @@ def mainmenu():
                         if option_rect.collidepoint(mouse_pos):
                             selected_time_option = i
                             if selected_time_option == 0:
-                                timer_duration = 2 * 60
+                                timer_duration = 30
                             elif selected_time_option == 1:
-                                timer_duration = 2 * 60 + 30
+                                timer_duration = 2 * 60
                             elif selected_time_option == 2:
-                                timer_duration = 5 * 60
+                                timer_duration = 3 * 60
                             break
                         x += option_width + font.size("| ")[0]
 
@@ -247,7 +247,7 @@ def mainmenu():
 
 
 def mm():
-    global score, ai_score,ti
+    global score, ai_score,ti,draw
     sc = pygame.display.set_mode((wd, he))
     pygame.display.set_caption("Gameover")
 
@@ -265,12 +265,15 @@ def mm():
     game_over_y2 = (he - button_height) // 2 - 80
     main_menu_x = (wd - button_width) // 2
     main_menu_y = (he - button_height) // 2 + 200
+    print(draw)
     if remaining_time == 0:
         game_over_text2 = font.render("Timeout!!", True, (255, 0, 0))
     elif draw == True:
-        game_over_text2 = font.render("No More Moves Available ", True, (0, 0, 0))
+        game_over_text2 = font.render("No More Moves Available ", True, (255, 0, 0))
+    elif lives == 0:
+        game_over_text2 = font.render("All Life Exhausted ", True, (255, 0, 0))
     else:
-        print("nothing")
+        print("Good to Go")
     if lives == 0:
         game_over_text = font2.render("AI WON ", True, (255, 255, 255))
         avatar_img3 = pygame.image.load("ai2.png")
@@ -310,6 +313,7 @@ def mm():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if game_over_button.collidepoint(mouse_pos):
+                    draw = False
                     return "menu"
 
         sc.fill(WHITISH)
@@ -435,6 +439,7 @@ global remaining_time
 while running:
     if game_state == "menu":
         a = mainmenu()
+        draw = False
         start_time = pygame.time.get_ticks()
         last_move_time = pygame.time.get_ticks()
         board = [[0 for _ in range(width)] for _ in range(height)]
@@ -449,13 +454,11 @@ while running:
             timer_duration - (pygame.time.get_ticks() - start_time) // 1000, 0
         )
         if lives == 0 or remaining_time == 0:
-            draw_board()
-            draw_score_board(remaining_time, elapsed_time, lives)
-            draw_tiles(board)
             a = mm()
             game_state = a
         if draw:
             a = mm()
+            draw = False
             game_state = a
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
