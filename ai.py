@@ -92,7 +92,7 @@ class AI:
         return board
 
     def minmax(board, depth, alpha, beta, maximize):
-        if depth == 10:
+        if depth == 8:
             return 0
         if maximize:
             maxval = 0

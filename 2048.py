@@ -25,7 +25,7 @@ ai_score = 0
 ai_time = False
 direction = ""
 game_state = "menu"
-timer_duration = 2 * 60 + 30
+timer_duration = 2*60
 lives = 1
 moves_without_change = 0
 max_moves_without_change = 3
@@ -55,7 +55,7 @@ def draw_score_board(remaining_time, move_time_limit, lives):
     avatar_rect = avatar_img.get_rect(left=60 + 600, centery=50, top=200)
     sc.blit(avatar_img, avatar_rect)
 
-    avatar_img2 = pygame.image.load("image.png")
+    avatar_img2 = pygame.image.load("aii.png")
     avatar_img2 = pygame.transform.scale(avatar_img2, (80, 80))
     avatar_rect2 = avatar_img2.get_rect(left=60, centery=50, top=200)
     border_rect2 = avatar_img.get_rect(left=60, centery=50, top=200).inflate(10, 10)
@@ -167,7 +167,7 @@ def mainmenu():
         start_game_x, start_game_y, button_width, button_height
     )
 
-    time_options = ["2 minutes", "2.5 minutes", "5 minutes"]
+    time_options = ["30 seconds", "2 minutes", "3 minutes"]
     selected_time_option = 1
     global timer_duration
 
@@ -196,11 +196,11 @@ def mainmenu():
                         if option_rect.collidepoint(mouse_pos):
                             selected_time_option = i
                             if selected_time_option == 0:
-                                timer_duration = 2 * 60
+                                timer_duration = 30
                             elif selected_time_option == 1:
-                                timer_duration = 2 * 60 + 30
+                                timer_duration = 2 * 60
                             elif selected_time_option == 2:
-                                timer_duration = 5 * 60
+                                timer_duration = 3 * 60
                             break
                         x += option_width + font.size("| ")[0]
 
@@ -247,7 +247,7 @@ def mainmenu():
 
 
 def mm():
-    global score, ai_score
+    global score, ai_score,ti,draw
     sc = pygame.display.set_mode((wd, he))
     pygame.display.set_caption("Gameover")
 
@@ -255,22 +255,52 @@ def mm():
         score = int(sys.argv[1])
 
     clock = pygame.time.Clock()
-    font = pygame.font.Font(None, 32)
+    font = pygame.font.Font(None, 45)
+    font2 = pygame.font.Font(None, 48)
+    font3 = pygame.font.Font(None, 32)
     button_width, button_height = 200, 50
 
     game_over_x = (wd - button_width) // 2
     game_over_y = (he - button_height) // 2 - 50
+    game_over_y2 = (he - button_height) // 2 - 80
     main_menu_x = (wd - button_width) // 2
-    main_menu_y = (he - button_height) // 2 + 50
-
-    if score > ai_score:
-        game_over_text = font.render("Human Won ", True, (255, 255, 255))
-    elif score == ai_score:
-        game_over_text = font.render("Match Drawn", True, (255, 255, 255))
+    main_menu_y = (he - button_height) // 2 + 200
+    print(draw)
+    if remaining_time == 0:
+        game_over_text2 = font.render("Timeout!!", True, (255, 0, 0))
+    elif draw == True:
+        game_over_text2 = font.render("No More Moves Available ", True, (255, 0, 0))
+    elif lives == 0:
+        game_over_text2 = font.render("All Life Exhausted ", True, (255, 0, 0))
     else:
-        game_over_text = font.render("AI Won", True, (255, 255, 255))
+        print("Good to Go")
+    if lives == 0:
+        game_over_text = font2.render("AI WON ", True, (255, 255, 255))
+        avatar_img3 = pygame.image.load("ai2.png")
+        avatar_img3 = pygame.transform.scale(avatar_img3, (wd, he))
+    elif score > ai_score:
+        game_over_text = font2.render("Human Won ", True, (255, 255, 255))
+        avatar_img3 = pygame.image.load("hw.png")
+        avatar_img3 = pygame.transform.scale(avatar_img3, (wd, he))
 
-    game_over_rect = game_over_text.get_rect(center=(wd // 2, game_over_y))
+    elif score == ai_score:
+        game_over_text = font2.render("Match Drawn", True, (0, 0, 0))
+        avatar_img3 = pygame.image.load("drawn2.png")
+        avatar_img3 = pygame.transform.scale(avatar_img3, (wd, he))
+
+    else:
+        game_over_text = font2.render("AI WON", True, (255, 255, 255))
+        avatar_img3 = pygame.image.load("ai2.png")
+        avatar_img3 = pygame.transform.scale(avatar_img3, (wd, he))
+
+    game_over_rect = game_over_text.get_rect(center=(wd // 2, game_over_y+50))
+    game_over_rect2 = game_over_text2.get_rect(center=(wd // 2, game_over_y2+50))
+    avatar_rect3 = avatar_img3.get_rect(left=0,top=0)
+
+    avatar_surface = pygame.Surface(avatar_img3.get_size())
+    avatar_surface.fill(WHITISH)
+    avatar_surface.blit(avatar_img3, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
 
     game_over_button = pygame.Rect(
         main_menu_x, main_menu_y, button_width, button_height
@@ -283,15 +313,20 @@ def mm():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if game_over_button.collidepoint(mouse_pos):
+                    draw = False
                     return "menu"
 
         sc.fill(WHITISH)
-
+        sc.blit(avatar_surface, avatar_rect3)
         sc.blit(game_over_text, game_over_rect)
+        sc.blit(game_over_text2, game_over_rect2)
 
-        pygame.draw.rect(sc, (255, 0, 0), game_over_button)
+        if game_over_button.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(sc, (255,79,55), game_over_button)
+        else:
+            pygame.draw.rect(sc, (255,0,0), game_over_button)
 
-        main_menu_text = font.render("Go to Main Menu", True, (255, 255, 255))
+        main_menu_text = font3.render("Go to Main Menu", True, (255, 255, 255))
         main_menu_rect = main_menu_text.get_rect(center=game_over_button.center)
         sc.blit(main_menu_text, main_menu_rect)
 
@@ -400,10 +435,11 @@ def take_turn(direction):
 running = True
 draw_new_board = True
 
-
+global remaining_time
 while running:
     if game_state == "menu":
         a = mainmenu()
+        draw = False
         start_time = pygame.time.get_ticks()
         last_move_time = pygame.time.get_ticks()
         board = [[0 for _ in range(width)] for _ in range(height)]
@@ -411,7 +447,7 @@ while running:
         init_count = 0
         score = 0
         ai_score = 0
-        lives = 1
+        lives = 3
         game_state = a
     else:
         remaining_time = max(
@@ -422,6 +458,7 @@ while running:
             game_state = a
         if draw:
             a = mm()
+            draw = False
             game_state = a
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -449,7 +486,8 @@ while running:
         if ai_time:
             move = AI.main(board)
             print(move)
-            # pygame.time.delay(2000)
+            
+            pygame.time.delay(1000)
             take_turn(direction=move)
             current_player = (current_player + 1) % len(players)
             ai_time = False
